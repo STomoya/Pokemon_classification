@@ -1,11 +1,11 @@
 
 # Pokemon_classification
 
-Image classification on [Pokemon Image Dataset](https://www.kaggle.com/vishalsubbiah/pokemon-images-and-types/downloads/pokemon-images-and-types.zip/3).
+Image classification on [Pokemon Image Dataset](https://www.kaggle.com/vishalsubbiah/pokemon-images-and-types).
 
-## Citation
+## Dataset
 
-[Pokemon Image Dataset](https://www.kaggle.com/vishalsubbiah/pokemon-images-and-types/downloads/pokemon-images-and-types.zip/3)
+[Pokemon Image Dataset](https://www.kaggle.com/vishalsubbiah/pokemon-images-and-types)
 
 ## License
 
