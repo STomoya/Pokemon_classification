@@ -10,6 +10,7 @@ jupyterlab = "*"
 pandas = "*"
 pillow = "*"
 numpy = "*"
+pathlib = "*"
 
 [requires]
 python_version = "3.7"
