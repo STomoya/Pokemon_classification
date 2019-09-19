@@ -38,7 +38,7 @@ def check_existance():
     does not check all of them.
     """
     path = Path('../data/')
-    if not path.exsits():
+    if not path.exists():
         _raise_existance_error('data directory')
     path = Path('../data/images/')
     if not path.exists():
@@ -97,11 +97,10 @@ def reshape_dataframe(pokemon):
             columns : Name, Type
     """
     melt_pokemon = pd.melt(pokemon, id_vars=['Name'], value_vars=['Type1', 'Type2'], value_name='Type')
-    melt_pokemon.drop(['variable'], axis=1, inplace=True)
     pokemon = melt_pokemon.dropna()
     return pokemon
 
-def place_image_by_type(pokemon_names, pokemon_types):
+def place_image_by_type(pokemon_names, pokemon_types, variables):
     """
     replace images to folders that represents types
 
@@ -113,21 +112,33 @@ def place_image_by_type(pokemon_names, pokemon_types):
     """
     # make new directory
     print('   ##      making new directory     ##   ')
+    try:
+        path = Path('../data/images/train/')
+        path.mkdir()
+        path = Path('../data/images/test/')
+        path.mkdir()
+    except:
+        pass
     unique_type = pokemon_types.unique()
     for folder in unique_type:
-        path = Path('../data/images/'+folder)
+        train_path = Path('../data/images/train/'+folder)
+        test_path = Path('../data/images/test/'+folder)
         try:
-            path.mkdir()
+            train_path.mkdir()
+            test_path.mkdir()
         except:
             pass
     print('   ##           finished            ##   ')
     # place images to the directory
     print('   ##       replacing images        ##   ')
-    for name, typ in zip(pokemon_names, pokemon_types):
+    for name, typ, v in zip(pokemon_names, pokemon_types, variables):
         path = Path('../data/images/'+name+'.jpg')
         if path.exists():
-            new_path = Path('../data/images/'+typ+'/'+name+'.jpg')
-            shutil.copy(str(path), str(new_path))
+            train_path = Path('../data/images/train/'+typ+'/'+name+'.jpg')
+            shutil.copy(str(path), str(train_path))
+            if 'Type1' == v:
+                test_path = Path('../data/images/test/'+typ+'/'+name+'.jpg')
+                shutil.copy(str(path), str(test_path))
     print('   ##           finished            ##   ')
     # erase images(one rsrc file exists in the dataset)
     print('   ##        erasing images         ##   ')
@@ -160,7 +171,7 @@ def augment():
         rot90 + mirror          (filename_rm)
         rot90 + flip + mirror   (filename_rfm)
     """
-    path = Path('../data/images/')
+    path = Path('../data/images/train/')
     img_paths = path.glob('*/*.jpg')
 
     for path in img_paths:
@@ -189,6 +200,17 @@ def augment():
         # rotate + flip + mirror
         rfm_img = ImageOps.mirror(rf_img)
         rfm_img.save(folder+'/'+filename+'_rfm.jpg')
+
+def erase_test_img_in_train():
+    """
+    erase test images(original images) from the training folders
+    """
+    ## test image in training data
+    path = Path('../data/images/train/')
+    train_file_paths = path.glob('*/*.jpg')
+    for file_path in train_file_paths:
+        if not '_' in file_path.stem:
+            os.remove(str(file_path))
 
 def update_csv(pokemon, filename='pokemon_alpha.csv'):
     """
@@ -224,16 +246,20 @@ def main():
     print(' #              finished               # ', end='\n\n')
 
     print(' #  image replacement to class folder  # ')
-    place_image_by_type(pokemon['Name'], pokemon['Type'])
+    place_image_by_type(pokemon['Name'], pokemon['Type'], pokemon['variable'])
     print(' #              finished               # ', end='\n\n')
 
     print(' #          data augmentation          # ')
     augment()
     print(' #              finished               # ', end='\n\n')
 
-    print(' #         update on csv file          # ')
-    update_csv(pokemon)
-    print(' #              finished               # ')
+    print(' #      erasing test image in train    # ')
+    erase_test_img_in_train()
+    print(' #              finished               # ', end='\n\n')
+
+    # print(' #         update on csv file          # ')
+    # update_csv(pokemon)
+    # print(' #              finished               # ')
     print('----------------FINISHED-----------------')
 
 if __name__ == '__main__':

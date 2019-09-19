@@ -11,6 +11,10 @@ pandas = "*"
 pillow = "*"
 numpy = "*"
 pathlib = "*"
+tensorflow = "*"
+tensorflow-gpu = "*"
+keras = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"
